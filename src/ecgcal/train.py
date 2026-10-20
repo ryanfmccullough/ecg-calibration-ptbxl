@@ -15,6 +15,15 @@ from .data import SUPERCLASSES, load_split, standardize
 from .model import ECGResNet
 
 
+def default_device() -> str:
+    """Device used when ``--device`` is not given: MPS (Apple silicon), then CUDA, then CPU."""
+    if torch.backends.mps.is_available():
+        return "mps"
+    if torch.cuda.is_available():
+        return "cuda"
+    return "cpu"
+
+
 def _loader(X: np.ndarray, y: np.ndarray, batch: int, shuffle: bool) -> DataLoader:
     ds = TensorDataset(torch.from_numpy(X), torch.from_numpy(y))
     return DataLoader(ds, batch_size=batch, shuffle=shuffle, num_workers=0)
@@ -41,7 +50,7 @@ def train(
 ) -> Path:
     torch.manual_seed(seed)
     np.random.seed(seed)
-    dev = torch.device(device or ("cuda" if torch.cuda.is_available() else "cpu"))
+    dev = torch.device(device or default_device())
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -72,7 +81,9 @@ def train(
             running += loss.item() * xb.size(0)
         val_logits = predict_logits(model, va, dev)
         val_loss = float(loss_fn(torch.from_numpy(val_logits), torch.from_numpy(splits["val"].y)))
-        history.append({"epoch": ep + 1, "train_loss": running / len(tr.dataset), "val_loss": val_loss})
+        history.append(
+            {"epoch": ep + 1, "train_loss": running / len(tr.dataset), "val_loss": val_loss}
+        )
         if val_loss < best_val:
             best_val = val_loss
             best_state = {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}
@@ -103,4 +114,4 @@ def train(
     return out_dir
 
 
-__all__ = ["train", "predict_logits"]
+__all__ = ["default_device", "predict_logits", "train"]

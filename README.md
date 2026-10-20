@@ -16,14 +16,14 @@ Accuracy ranks models. Calibration and operating points decide whether a model i
 ```bash
 pip install -e ".[dev]"
 scripts/download_ptbxl.sh data/            # about 1.7 GB, one time
-ecgcal train   --data data/ptbxl --out runs/baseline   # add --device mps|cuda for a GPU
+ecgcal train   --data data/ptbxl --out runs/baseline   # picks mps, then cuda, then cpu
 ecgcal evaluate --run runs/baseline         # metrics, calibration, operating points
 ecgcal report  --run runs/baseline          # figures and tables under reports/
 ```
 
 The download script uses PhysioNet's public S3 mirror through the `aws` CLI when it is installed (minutes), and falls back to a recursive `wget` from physionet.org otherwise (works, but PhysioNet throttles it heavily).
 
-Everything is CPU-runnable: about two minutes per epoch on a 16-core laptop CPU, and a few seconds per epoch with `--device mps` on Apple silicon or `--device cuda`.
+Training picks a device automatically: MPS on Apple silicon, then CUDA, then CPU; `--device cpu` (or `mps`, `cuda`) overrides it. Everything is CPU-runnable at about two minutes per epoch on a 16-core laptop CPU; either GPU brings an epoch down to a few seconds.
 
 ## Results
 
@@ -71,7 +71,7 @@ The dataset is not redistributed here; the download script fetches it from Physi
 
 ## Status
 
-Scaffold, unit tests, baseline training, and the results table are complete. Engineering verification only; nothing here is clinically validated.
+Scaffold, unit tests, baseline training, and the results table are complete; `STATUS.md` lists what is done and the open ideas. Engineering verification only; nothing here is clinically validated.
 
 ## Author
 

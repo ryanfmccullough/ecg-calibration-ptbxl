@@ -7,18 +7,24 @@ from pathlib import Path
 
 
 def main(argv: list[str] | None = None) -> None:
-    p = argparse.ArgumentParser(prog="ecgcal", description="Calibrated ECG classification on PTB-XL")
+    p = argparse.ArgumentParser(
+        prog="ecgcal", description="Calibrated ECG classification on PTB-XL"
+    )
     sub = p.add_subparsers(dest="cmd", required=True)
 
     t = sub.add_parser("train", help="train the baseline and write logits to a run directory")
-    t.add_argument("--data", type=Path, required=True, help="PTB-XL root (contains ptbxl_database.csv)")
+    t.add_argument(
+        "--data", type=Path, required=True, help="PTB-XL root (contains ptbxl_database.csv)"
+    )
     t.add_argument("--out", type=Path, required=True)
     t.add_argument("--epochs", type=int, default=20)
     t.add_argument("--batch", type=int, default=128)
     t.add_argument("--lr", type=float, default=1e-3)
     t.add_argument("--seed", type=int, default=0)
     t.add_argument("--sampling-rate", type=int, default=100, choices=[100, 500])
-    t.add_argument("--device", default=None)
+    t.add_argument(
+        "--device", default=None, help="torch device; defaults to mps, then cuda, then cpu"
+    )
 
     e = sub.add_parser("evaluate", help="discrimination, calibration, operating points")
     e.add_argument("--run", type=Path, required=True)
