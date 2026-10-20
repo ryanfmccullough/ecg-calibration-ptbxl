@@ -99,9 +99,9 @@ def fit_temperature_per_class(logits: np.ndarray, labels: np.ndarray) -> np.ndar
 
 __all__ = [
     "ReliabilityBins",
-    "reliability_bins",
+    "apply_temperature",
     "expected_calibration_error",
     "fit_temperature",
     "fit_temperature_per_class",
-    "apply_temperature",
+    "reliability_bins",
 ]

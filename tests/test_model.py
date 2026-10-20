@@ -2,7 +2,7 @@ import pytest
 
 torch = pytest.importorskip("torch")
 
-from ecgcal.model import ECGResNet  # noqa: E402
+from ecgcal.model import ECGResNet
 
 
 def test_forward_shape():

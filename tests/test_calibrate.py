@@ -41,9 +41,9 @@ def test_fit_temperature_recovers_known_value():
     logits, labels, true_t = _synthetic()
     t = fit_temperature(logits, labels)
     assert abs(t - true_t) / true_t < 0.1
-    assert expected_calibration_error(apply_temperature(logits, t), labels) < expected_calibration_error(
-        1 / (1 + np.exp(-logits)), labels
-    )
+    assert expected_calibration_error(
+        apply_temperature(logits, t), labels
+    ) < expected_calibration_error(1 / (1 + np.exp(-logits)), labels)
 
 
 def test_fit_temperature_per_class_handles_matrix():

@@ -1,7 +1,11 @@
 import numpy as np
 import pytest
 
-from ecgcal.thresholds import operating_point_table, threshold_at_alert_budget, threshold_at_sensitivity
+from ecgcal.thresholds import (
+    operating_point_table,
+    threshold_at_alert_budget,
+    threshold_at_sensitivity,
+)
 
 
 def _scores():

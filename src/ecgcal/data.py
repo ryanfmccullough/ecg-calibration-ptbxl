@@ -97,8 +97,8 @@ __all__ = [
     "SUPERCLASSES",
     "Split",
     "load_metadata",
-    "superclass_labels",
     "load_signals",
     "load_split",
     "standardize",
+    "superclass_labels",
 ]

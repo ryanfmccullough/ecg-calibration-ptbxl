@@ -28,7 +28,9 @@ def evaluate(run_dir: Path, sensitivity_target: float = 0.90) -> pd.DataFrame:
 
     temps = fit_temperature_per_class(val_logits, val_labels)
     raw = 1.0 / (1.0 + np.exp(-test_logits))
-    cal = np.column_stack([apply_temperature(test_logits[:, j], temps[j]) for j in range(len(temps))])
+    cal = np.column_stack(
+        [apply_temperature(test_logits[:, j], temps[j]) for j in range(len(temps))]
+    )
 
     rows = []
     tables = {}
@@ -55,7 +57,9 @@ def evaluate(run_dir: Path, sensitivity_target: float = 0.90) -> pd.DataFrame:
     summary.to_csv(run_dir / "summary.csv", index=False)
     for cls, tab in tables.items():
         tab.to_csv(run_dir / f"operating_points_{cls}.csv", index=False)
-    (run_dir / "temperatures.json").write_text(json.dumps(dict(zip(SUPERCLASSES, map(float, temps))), indent=2))
+    (run_dir / "temperatures.json").write_text(
+        json.dumps(dict(zip(SUPERCLASSES, map(float, temps))), indent=2)
+    )
     return summary
 
 
@@ -75,7 +79,7 @@ _SUMMARY_HEADINGS = {
 
 def _heading(col: str) -> str:
     if col.startswith("threshold_at_") and col.endswith("pct_sens"):
-        return f"Threshold @ {col[len('threshold_at_'):-len('pct_sens')]}% sensitivity"
+        return f"Threshold @ {col[len('threshold_at_') : -len('pct_sens')]}% sensitivity"
     return _SUMMARY_HEADINGS.get(col, col)
 
 
@@ -109,7 +113,9 @@ def report(run_dir: Path, out_dir: Path = Path("reports")) -> None:
 
     (out_dir / "summary.md").write_text(markdown_table(summary) + "\n")
 
-    fig, axes = plt.subplots(1, len(SUPERCLASSES), figsize=(3.2 * len(SUPERCLASSES), 3.2), sharey=True)
+    fig, axes = plt.subplots(
+        1, len(SUPERCLASSES), figsize=(3.2 * len(SUPERCLASSES), 3.2), sharey=True
+    )
     for j, (cls, ax) in enumerate(zip(SUPERCLASSES, axes)):
         y = test_labels[:, j]
         raw = 1.0 / (1.0 + np.exp(-test_logits[:, j]))

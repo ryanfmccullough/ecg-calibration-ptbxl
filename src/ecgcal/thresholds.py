@@ -70,4 +70,4 @@ def threshold_at_alert_budget(table: pd.DataFrame, alerts_per_100: float) -> pd.
     return ok.loc[ok["threshold"].idxmin()]
 
 
-__all__ = ["operating_point_table", "threshold_at_sensitivity", "threshold_at_alert_budget"]
+__all__ = ["operating_point_table", "threshold_at_alert_budget", "threshold_at_sensitivity"]

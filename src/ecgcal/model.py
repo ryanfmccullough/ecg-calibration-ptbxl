@@ -22,7 +22,9 @@ class ResBlock(nn.Module):
         self.skip = (
             nn.Identity()
             if c_in == c_out and stride == 1
-            else nn.Sequential(nn.Conv1d(c_in, c_out, 1, stride=stride, bias=False), nn.BatchNorm1d(c_out))
+            else nn.Sequential(
+                nn.Conv1d(c_in, c_out, 1, stride=stride, bias=False), nn.BatchNorm1d(c_out)
+            )
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -32,7 +34,9 @@ class ResBlock(nn.Module):
 
 
 class ECGResNet(nn.Module):
-    def __init__(self, n_leads: int = 12, n_classes: int = 5, width: int = 32, dropout: float = 0.2):
+    def __init__(
+        self, n_leads: int = 12, n_classes: int = 5, width: int = 32, dropout: float = 0.2
+    ):
         super().__init__()
         self.stem = nn.Sequential(
             nn.Conv1d(n_leads, width, 15, stride=2, padding=7, bias=False),
