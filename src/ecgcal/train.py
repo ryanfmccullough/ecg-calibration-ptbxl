@@ -69,7 +69,7 @@ def train(
             loss.backward()
             opt.step()
             sched.step()
-            running += float(loss) * xb.size(0)
+            running += loss.item() * xb.size(0)
         val_logits = predict_logits(model, va, dev)
         val_loss = float(loss_fn(torch.from_numpy(val_logits), torch.from_numpy(splits["val"].y)))
         history.append({"epoch": ep + 1, "train_loss": running / len(tr.dataset), "val_loss": val_loss})
@@ -92,6 +92,7 @@ def train(
                 "lr": lr,
                 "seed": seed,
                 "sampling_rate": sampling_rate,
+                "device": str(dev),
                 "classes": SUPERCLASSES,
                 "train_seconds": round(time.time() - t0, 1),
                 "history": history,

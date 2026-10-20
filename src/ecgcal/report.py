@@ -59,6 +59,40 @@ def evaluate(run_dir: Path, sensitivity_target: float = 0.90) -> pd.DataFrame:
     return summary
 
 
+# summary.csv column -> README heading. Keeps summary.md paste-ready for the Results table.
+_SUMMARY_HEADINGS = {
+    "class": "Class",
+    "prevalence": "Prevalence",
+    "auroc": "AUROC",
+    "auprc": "AUPRC",
+    "ece_raw": "ECE (raw)",
+    "ece_temp_scaled": "ECE (temp-scaled)",
+    "temperature": "Temperature",
+    "alerts_per_100_at_target": "Alerts / 100 ECGs @ that threshold",
+    "ppv_at_target": "PPV @ that threshold",
+}
+
+
+def _heading(col: str) -> str:
+    if col.startswith("threshold_at_") and col.endswith("pct_sens"):
+        return f"Threshold @ {col[len('threshold_at_'):-len('pct_sens')]}% sensitivity"
+    return _SUMMARY_HEADINGS.get(col, col)
+
+
+def markdown_table(df: pd.DataFrame, floatfmt: str = ".3f") -> str:
+    """Pipe-delimited markdown table (avoids the ``tabulate`` dependency of ``to_markdown``)."""
+
+    def cell(v: object) -> str:
+        return format(v, floatfmt) if isinstance(v, float) else str(v)
+
+    lines = [
+        "| " + " | ".join(_heading(str(c)) for c in df.columns) + " |",
+        "|" + "|".join("---" for _ in df.columns) + "|",
+    ]
+    lines += ["| " + " | ".join(cell(v) for v in row) + " |" for row in df.itertuples(index=False)]
+    return "\n".join(lines)
+
+
 def report(run_dir: Path, out_dir: Path = Path("reports")) -> None:
     """Markdown table plus reliability diagrams and alert-vs-sensitivity curves."""
     import matplotlib
@@ -73,7 +107,7 @@ def report(run_dir: Path, out_dir: Path = Path("reports")) -> None:
     test_labels = np.load(run_dir / "test_labels.npy")
     temps = json.loads((run_dir / "temperatures.json").read_text())
 
-    (out_dir / "summary.md").write_text(summary.to_markdown(index=False, floatfmt=".3f") + "\n")
+    (out_dir / "summary.md").write_text(markdown_table(summary) + "\n")
 
     fig, axes = plt.subplots(1, len(SUPERCLASSES), figsize=(3.2 * len(SUPERCLASSES), 3.2), sharey=True)
     for j, (cls, ax) in enumerate(zip(SUPERCLASSES, axes)):
@@ -105,4 +139,4 @@ def report(run_dir: Path, out_dir: Path = Path("reports")) -> None:
     plt.close(fig)
 
 
-__all__ = ["evaluate", "report"]
+__all__ = ["evaluate", "markdown_table", "report"]
